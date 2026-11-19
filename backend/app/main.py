@@ -43,7 +43,10 @@ async def upload(file: UploadFile):
             results, cached = await analyse(rows, cache, provider)
         except GeminiConfigurationError as error:
             raise HTTPException(503, str(error)) from error
-    return {"reviews": results, "dashboard": dashboard(results), "skipped": skipped,
+    stats = dashboard(results)
+    for row in results:
+        del row["findings"]
+    return {"reviews": results, "dashboard": stats, "skipped": skipped,
             "metrics": {"api_calls": provider.calls, "cached": cached,
                         "seconds": round(time.monotonic() - started, 2)}}
 

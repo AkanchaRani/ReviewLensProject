@@ -39,7 +39,7 @@ These screenshots use the assessment CSV and simulated Gemini responses.
 
 React sends multipart uploads and reply requests through the Vite proxy to FastAPI. The API decodes UTF-8, strips markup from review text, normalizes whitespace, treats invalid ratings as unknown and deduplicates by normalized text hash. It sends uncached reviews to Gemini sequentially in batches of five. HTTP 429, 5xx and transient connection errors use two retries with one- and two-second delays. Each response item must pass the strict Pydantic schema. Invalid items get one additional analysis attempt. Successful items go into SQLite so repeated uploads reuse them.
 
-The dashboard aggregates valid analyses. Complaint and praise themes count topics on negative and positive reviews respectively. Agreement compares known ratings with sentiment (1–2 negative, 3 neutral, 4–5 positive). Reply drafts are generated on click and displayed as text. The browser only calls the local API.
+The dashboard aggregates valid analyses. Complaint and praise themes count each topic's own sentiment. A mixed review can praise quality while complaining about packaging. Gemini supplies a short English example for each topic. The cache uses a versioned key, so the first upload after the topic analysis upgrade recalculates older results once. Agreement compares known ratings with sentiment (1–2 negative, 3 neutral, 4–5 positive). Reply drafts are generated on click and displayed as text. The browser only calls the local API.
 
 ## Prompt and R012
 

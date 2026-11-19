@@ -4,7 +4,7 @@ import httpx
 from pydantic import ValidationError
 
 from .provider import ANALYSIS_PROMPT
-from .schema import Analysis
+from .schema import ReviewResult
 
 BATCH_SIZE = 5
 
@@ -33,7 +33,7 @@ async def analyse(rows, cache, provider):
             invalid = []
             for row, value in zip(batch, output):
                 try:
-                    analysis = Analysis.model_validate(value)
+                    analysis = ReviewResult.model_validate(value)
                 except ValidationError:
                     invalid.append(row)
                     continue
@@ -42,7 +42,8 @@ async def analyse(rows, cache, provider):
             batch = invalid
     return [
         {**row, "status": "analysed" if row["key"] in results else "analysis_failed",
-         "analysis": results.get(row["key"])}
+         "analysis": results[row["key"]].analysis if row["key"] in results else None,
+         "findings": results[row["key"]].findings if row["key"] in results else []}
         for row in rows
     ], cached
 
@@ -52,6 +53,7 @@ def dashboard(rows):
     themes = defaultdict(lambda: defaultdict(list))
     needs_reply = matches = rated = 0
     for row in rows:
+        findings = row["findings"]
         analysis = row["analysis"]
         if analysis is None:
             continue
@@ -62,8 +64,8 @@ def dashboard(rows):
             expected = ("negative", "negative", "neutral", "positive", "positive")[row["rating"] - 1]
             row["rating_mismatch"] = expected != analysis.sentiment
             matches += not row["rating_mismatch"]
-        for topic in set(analysis.topics):
-            themes[analysis.sentiment][topic].append(analysis.summary)
+        for finding in findings:
+            themes[finding.sentiment][finding.topic].append(finding.evidence)
 
     def top(sentiment):
         return [{"topic": topic, "count": len(examples), "example": examples[0]}
