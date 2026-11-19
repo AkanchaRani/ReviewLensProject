@@ -1,3 +1,33 @@
+commit 473902e683bf49d798f6a1ee1ade83009405a134
+Author: Akancha Rani <akancharani2@gmail.com>
+Date:   2026-11-19 20:04:19 +0530
+
+    Show the verified dashboard and live reply in the README
+
+commit c4edaf6baed5a64ed4d44be0556b97a0fe746d4a
+Author: Akancha Rani <akancharani2@gmail.com>
+Date:   2026-11-19 20:04:19 +0530
+
+    Constrain Gemini responses to the expected JSON structure
+
+commit 1a7a8659df4cab423f5524b85863419da8974d34
+Author: Akancha Rani <akancharani2@gmail.com>
+Date:   2026-11-19 19:59:40 +0530
+
+    Count dashboard themes by individual topic sentiment
+
+commit 297cafd447d101d4f03fc3c92629167d450fec03
+Author: Akancha Rani <akancharani2@gmail.com>
+Date:   2026-11-19 19:32:27 +0530
+
+    Show actionable errors when Gemini configuration fails
+
+commit fd866200c247d7721b944bf498a72945dd8116c6
+Author: Akancha Rani <akancharani2@gmail.com>
+Date:   2026-11-19 19:30:08 +0530
+
+    Refresh Git history after live Gemini verification
+
 commit 7f08cf26afdaf99515cbec4ae8b95a5d7d0def0f
 Author: Akancha Rani <akancharani2@gmail.com>
 Date:   2026-11-19 19:28:19 +0530
