@@ -73,6 +73,8 @@ class ReviewLensTests(unittest.IsolatedAsyncioTestCase):
             body = json.loads(request.content)
             self.assertEqual(body["systemInstruction"]["parts"][0]["text"], ANALYSIS_PROMPT)
             self.assertEqual(json.loads(body["contents"][0]["parts"][0]["text"]), ["Review text"])
+            schema = body["generationConfig"]["responseJsonSchema"]
+            self.assertEqual((schema["minItems"], schema["maxItems"]), (1, 1))
             return httpx.Response(next(statuses), json={"candidates": [
                 {"content": {"parts": [{"text": json.dumps([VALID])}]}}]})
 
