@@ -18,6 +18,18 @@ Acknowledge the specific issue and offer a reasonable next step. Never promise r
 claim an action was taken or request private details in public."""
 
 
+CONFIG_ERRORS = {
+    400: "Gemini rejected the request. Check the API key and model in backend/.env.",
+    401: "Gemini rejected the API key. Check GEMINI_API_KEY in backend/.env.",
+    403: "Gemini denied access. Check your API key and project permissions.",
+    404: "Gemini model is unavailable. Check GEMINI_MODEL in backend/.env.",
+}
+
+
+class GeminiConfigurationError(Exception):
+    pass
+
+
 class Gemini:
     def __init__(self, client):
         self.client = client
@@ -26,7 +38,7 @@ class Gemini:
     async def generate(self, prompt, data):
         key = os.getenv("GEMINI_API_KEY")
         if not key:
-            raise RuntimeError("Set GEMINI_API_KEY on the server.")
+            raise GeminiConfigurationError("Set GEMINI_API_KEY on the server.")
         model = os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite")
         for attempt in range(3):
             try:
@@ -42,6 +54,8 @@ class Gemini:
                 break
             except httpx.HTTPStatusError as error:
                 status = error.response.status_code
+                if status in CONFIG_ERRORS:
+                    raise GeminiConfigurationError(CONFIG_ERRORS[status]) from error
                 if attempt == 2 or (status != 429 and status < 500):
                     raise
             except httpx.RequestError:
