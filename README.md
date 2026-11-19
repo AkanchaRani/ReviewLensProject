@@ -29,7 +29,7 @@ Open the URL printed by Vite and upload the root-level `reviews.csv`. Try filter
 
 ## Dashboard screenshots
 
-These screenshots use the assessment CSV and simulated Gemini responses.
+These screenshots use the assessment CSV and live Gemini results. The dashboard image shows a repeat upload with all 28 analyses served from cache.
 
 ![ReviewLens dashboard with sentiment totals, themes and the review table](screenshots/dashboard.png)
 
