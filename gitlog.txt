@@ -1,3 +1,15 @@
+commit 7f08cf26afdaf99515cbec4ae8b95a5d7d0def0f
+Author: Akancha Rani <akancharani2@gmail.com>
+Date:   2026-11-19 19:28:19 +0530
+
+    Update Gemini default to working Flash-Lite model
+
+commit a9f37d84f51d17d65a9b44cf91acc6b7558e359e
+Author: Akancha Rani <akancharani2@gmail.com>
+Date:   2026-11-19 14:58:55 +0530
+
+    Include the required Git history in the submission
+
 commit 601c6814aeb82796f0620e702dd21e35cbe58ad8
 Author: Akancha Rani <akancharani2@gmail.com>
 Date:   2026-11-19 14:58:54 +0530
