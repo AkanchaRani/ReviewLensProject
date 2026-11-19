@@ -27,7 +27,7 @@ class Gemini:
         key = os.getenv("GEMINI_API_KEY")
         if not key:
             raise RuntimeError("Set GEMINI_API_KEY on the server.")
-        model = os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite")
+        model = os.getenv("GEMINI_MODEL", "gemini-3.1-flash-lite")
         for attempt in range(3):
             try:
                 self.calls += 1
