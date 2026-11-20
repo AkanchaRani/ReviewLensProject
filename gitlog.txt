@@ -1,3 +1,15 @@
+commit 04a5a2357cb8baa9d2908deac8bd9c67fe70e60a
+Author: Akancha Rani <akancharani2@gmail.com>
+Date:   2026-11-20 15:05:56 +0530
+
+    Surface Gemini outages and stop exhausted batch retries
+
+commit 57aafe3030c7dea9b0c3a2e8ff6e220e026ec3c2
+Author: Akancha Rani <akancharani2@gmail.com>
+Date:   2026-11-20 11:56:11 +0530
+
+    Refresh submission history for deployment setup
+
 commit d83e3d589782665e8dff101a668265ec2c5fabb8
 Author: Akancha Rani <akancharani2@gmail.com>
 Date:   2026-11-20 11:56:11 +0530
