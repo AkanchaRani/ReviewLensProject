@@ -7,6 +7,7 @@ from pathlib import Path
 import httpx
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, UploadFile
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field, ValidationError
 
 from .cache import Cache
@@ -65,3 +66,12 @@ async def reply(request: ReplyRequest):
             except httpx.HTTPError:
                 break
     raise HTTPException(502, "Could not generate a reply. Please try again.")
+
+@app.get("/api/health")
+async def health():
+    return {"status": "ok"}
+
+
+static_dir = os.getenv("REVIEWLENS_STATIC_DIR")
+if static_dir:
+    app.mount("/", StaticFiles(directory=static_dir, html=True), name="dashboard")

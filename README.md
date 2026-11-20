@@ -83,6 +83,12 @@ Open the URL Vite prints and upload the included [reviews.csv](reviews.csv). The
 
 > **Try R012.** Filter for **Wireless Earbuds X2 → negative → quality**, then click **Suggest reply** on R012. Upload the same CSV again to see cache reuse in the run summary.
 
+## Deploy on Render
+
+[Create a Render Blueprint from this repository](https://render.com/deploy?repo=https%3A%2F%2Fgithub.com%2FAkanchaRani%2FReviewLensProject). Sign in, pick a workspace, enter your Gemini key in the prompted environment field, and deploy. FastAPI serves the built dashboard and API at the same URL.
+
+After deployment, open the service URL and upload [reviews.csv](reviews.csv). On Render Free, the service can sleep and the SQLite cache resets when the instance spins down, restarts, or redeploys. [Render Free limitations](https://render.com/docs/free)
+
 ## How it works
 
 ~~~mermaid
