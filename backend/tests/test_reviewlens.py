@@ -139,3 +139,30 @@ class ReviewLensTests(unittest.IsolatedAsyncioTestCase):
             cached_rows, cached = await analyse([row], cache, provider)
             self.assertEqual(cached, 1)
             self.assertEqual(dashboard(cached_rows), stats)
+
+
+    async def test_exhausted_provider_quota_stops_additional_batches(self):
+        calls = []
+
+        def rate_limited(request):
+            calls.append(request.url.path)
+            return httpx.Response(429)
+
+        csv = ("review_id,product,rating,date,review_text\n" + "".join(
+            f"R{i},Headphones,1,2026-11-19,Issue {i}\n" for i in range(6)
+        )).encode()
+        with tempfile.TemporaryDirectory() as directory, patch.dict("os.environ", {
+            "GEMINI_API_KEY": "test-key",
+            "REVIEWLENS_CACHE": str(Path(directory) / "cache.sqlite3"),
+        }):
+            async with (
+                httpx.AsyncClient(transport=httpx.MockTransport(rate_limited)) as upstream,
+                httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client,
+            ):
+                with patch("app.main.Gemini", side_effect=lambda _: Gemini(upstream)), patch(
+                    "app.provider.asyncio.sleep", new_callable=AsyncMock
+                ):
+                    response = await client.post("/api/analyse", files={"file": ("reviews.csv", csv)})
+        self.assertEqual(response.status_code, 503)
+        self.assertIn("HTTP 429", response.json()["detail"])
+        self.assertEqual(len(calls), 3)

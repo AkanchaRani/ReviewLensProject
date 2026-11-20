@@ -1,5 +1,6 @@
 import asyncio
 import json
+import logging
 import os
 
 import httpx
@@ -38,6 +39,8 @@ def gemini_schema(schema):
     )
 
 
+logger = logging.getLogger(__name__)
+
 DEFAULT_MODEL = "gemini-3.1-flash-lite"
 ANALYSIS_SCHEMA = gemini_schema(TypeAdapter(list[ReviewResult]).json_schema())
 REPLY_SCHEMA = gemini_schema(Reply.model_json_schema())
@@ -51,6 +54,10 @@ CONFIG_ERRORS = {
 
 
 class GeminiConfigurationError(Exception):
+    pass
+
+
+class GeminiUnavailableError(Exception):
     pass
 
 
@@ -83,13 +90,19 @@ class Gemini:
                 break
             except httpx.HTTPStatusError as error:
                 status = error.response.status_code
+                logger.warning("Gemini model %s returned HTTP %s (attempt %s)", model, status, attempt + 1)
                 if status in CONFIG_ERRORS:
                     raise GeminiConfigurationError(CONFIG_ERRORS[status]) from error
+                if attempt == 2 and status == 429:
+                    raise GeminiUnavailableError(
+                        "Gemini rate limit or quota reached (HTTP 429). Check usage and limits in Google AI Studio, then retry."
+                    ) from error
                 if attempt == 2 or (status != 429 and status < 500):
-                    raise
-            except httpx.RequestError:
+                    raise GeminiUnavailableError(f"Gemini service request failed (HTTP {status}). Please retry.") from error
+            except httpx.RequestError as error:
+                logger.warning("Gemini connection failed with %s (attempt %s)", type(error).__name__, attempt + 1)
                 if attempt == 2:
-                    raise
+                    raise GeminiUnavailableError("Could not connect to Gemini. Please retry.") from error
             await asyncio.sleep(2 ** attempt)
         try:
             parts = response.json()["candidates"][0]["content"]["parts"]

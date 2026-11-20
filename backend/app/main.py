@@ -12,7 +12,7 @@ from pydantic import BaseModel, Field, ValidationError
 
 from .cache import Cache
 from .clean import clean_csv
-from .provider import Gemini, GeminiConfigurationError, REPLY_PROMPT
+from .provider import Gemini, GeminiConfigurationError, GeminiUnavailableError, REPLY_PROMPT
 from .schema import Reply
 from .service import analyse, dashboard
 
@@ -42,7 +42,7 @@ async def upload(file: UploadFile):
         provider = Gemini(client)
         try:
             results, cached = await analyse(rows, cache, provider)
-        except GeminiConfigurationError as error:
+        except (GeminiConfigurationError, GeminiUnavailableError) as error:
             raise HTTPException(503, str(error)) from error
     stats = dashboard(results)
     for row in results:
@@ -61,10 +61,8 @@ async def reply(request: ReplyRequest):
                 return Reply.model_validate(await provider.generate(REPLY_PROMPT, request.model_dump()))
             except ValidationError:
                 continue
-            except GeminiConfigurationError as error:
+            except (GeminiConfigurationError, GeminiUnavailableError) as error:
                 raise HTTPException(503, str(error)) from error
-            except httpx.HTTPError:
-                break
     raise HTTPException(502, "Could not generate a reply. Please try again.")
 
 @app.get("/api/health")

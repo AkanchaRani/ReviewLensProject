@@ -1,9 +1,8 @@
 from collections import Counter, defaultdict
 
-import httpx
 from pydantic import ValidationError
 
-from .provider import ANALYSIS_PROMPT
+from .provider import ANALYSIS_PROMPT, GeminiUnavailableError
 from .schema import ReviewResult
 
 BATCH_SIZE = 5
@@ -21,12 +20,16 @@ async def analyse(rows, cache, provider):
     cached = len(results)
     for start in range(0, len(pending), BATCH_SIZE):
         batch = pending[start:start + BATCH_SIZE]
+        unavailable = False
         for _ in range(2):
             if not batch:
                 break
             try:
                 output = await provider.generate(ANALYSIS_PROMPT, [r["review_text"] for r in batch])
-            except httpx.HTTPError:
+            except GeminiUnavailableError:
+                if not results:
+                    raise
+                unavailable = True
                 break
             if not isinstance(output, list) or len(output) != len(batch):
                 continue
@@ -40,6 +43,8 @@ async def analyse(rows, cache, provider):
                 cache.put(row["key"], analysis)
                 results[row["key"]] = analysis
             batch = invalid
+        if unavailable:
+            break
     return [
         {**row, "status": "analysed" if row["key"] in results else "analysis_failed",
          "analysis": results[row["key"]].analysis if row["key"] in results else None,
