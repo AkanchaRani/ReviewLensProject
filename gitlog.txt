@@ -1,3 +1,15 @@
+commit c787aecf7d5ee58967fe9b6e8ba52580d4994097
+Author: Akancha Rani <akancharani2@gmail.com>
+Date:   2026-11-20 11:51:41 +0530
+
+    Redesign README around the live dashboard and walkthrough
+
+commit 5c5dfe2bfaf79ddb5691af1f7a543bbf7fccb61e
+Author: Akancha Rani <akancharani2@gmail.com>
+Date:   2026-11-19 20:04:20 +0530
+
+    Refresh submission history after dashboard improvements
+
 commit 473902e683bf49d798f6a1ee1ade83009405a134
 Author: Akancha Rani <akancharani2@gmail.com>
 Date:   2026-11-19 20:04:19 +0530
