@@ -166,3 +166,14 @@ class ReviewLensTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(response.status_code, 503)
         self.assertIn("HTTP 429", response.json()["detail"])
         self.assertEqual(len(calls), 3)
+
+
+    async def test_copied_key_is_trimmed_before_use(self):
+        def handler(request):
+            self.assertEqual(request.headers["x-goog-api-key"], "test-key")
+            return httpx.Response(200, json={"candidates": [
+                {"content": {"parts": [{"text": json.dumps([RESULT])}]}}]})
+
+        async with httpx.AsyncClient(transport=httpx.MockTransport(handler)) as client:
+            with patch.dict("os.environ", {"GEMINI_API_KEY": '  "test-key"  '}):
+                self.assertEqual(await Gemini(client).generate(ANALYSIS_PROMPT, ["Review text"]), [RESULT])

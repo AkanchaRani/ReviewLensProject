@@ -67,9 +67,15 @@ class Gemini:
         self.calls = 0
 
     async def generate(self, prompt, data):
-        key = os.getenv("GEMINI_API_KEY")
+        key = os.getenv("GEMINI_API_KEY", "").strip()
+        if len(key) >= 2 and key[0] == key[-1] and key[0] in ("'", '"'):
+            key = key[1:-1].strip()
         if not key:
             raise GeminiConfigurationError("Set GEMINI_API_KEY on the server.")
+        if not key.isascii() or not key.isprintable() or " " in key or "=" in key:
+            raise GeminiConfigurationError(
+                "GEMINI_API_KEY must contain only the copied API key value. Check the server environment."
+            )
         model = os.getenv("GEMINI_MODEL", DEFAULT_MODEL)
         schema = ({**ANALYSIS_SCHEMA, "minItems": len(data), "maxItems": len(data)}
                   if prompt == ANALYSIS_PROMPT else REPLY_SCHEMA)
@@ -99,6 +105,11 @@ class Gemini:
                     ) from error
                 if attempt == 2 or (status != 429 and status < 500):
                     raise GeminiUnavailableError(f"Gemini service request failed (HTTP {status}). Please retry.") from error
+            except httpx.LocalProtocolError as error:
+                logger.warning("Gemini request could not be sent due to a local HTTP protocol error")
+                raise GeminiConfigurationError(
+                    "Gemini request could not be sent. Re-enter just the API key value in the server environment."
+                ) from error
             except httpx.RequestError as error:
                 logger.warning("Gemini connection failed with %s (attempt %s)", type(error).__name__, attempt + 1)
                 if attempt == 2:
