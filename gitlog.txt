@@ -1,3 +1,15 @@
+commit c4c423e8e02113ab78a40131fbd0d4fae0578641
+Author: Akancha Rani <akancharani2@gmail.com>
+Date:   2026-11-20 15:13:35 +0530
+
+    Normalize copied Gemini keys before sending requests
+
+commit 6f563572148dbe651e926ff4f37f4db49f99796a
+Author: Akancha Rani <akancharani2@gmail.com>
+Date:   2026-11-20 15:05:57 +0530
+
+    Refresh submission history after Gemini error handling
+
 commit 04a5a2357cb8baa9d2908deac8bd9c67fe70e60a
 Author: Akancha Rani <akancharani2@gmail.com>
 Date:   2026-11-20 15:05:56 +0530
